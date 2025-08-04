@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* KENANG WAVE EFFECT - Letter by Letter Flow */
+.kenang-letter-1,
+.kenang-letter-2,
+.kenang-letter-3,
+.kenang-letter-4,
+.kenang-letter-5,
+.kenang-letter-6 {
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Light mode - elegant wave that flows left to right */
+.kenang-letter-1 { 
+  color: #ec4899;
+  animation: letterWave 4s ease-in-out infinite;
+  animation-delay: 0s;
+}
+.kenang-letter-2 { 
+  color: #ec4899;
+  animation: letterWave 4s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+.kenang-letter-3 { 
+  color: #ec4899;
+  animation: letterWave 4s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+.kenang-letter-4 { 
+  color: #ec4899;
+  animation: letterWave 4s ease-in-out infinite;
+  animation-delay: 0.9s;
+}
+.kenang-letter-5 { 
+  color: #ec4899;
+  animation: letterWave 4s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+.kenang-letter-6 { 
+  color: #ec4899;
+  animation: letterWave 4s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+/* Dark mode - glowing wave effect with SAME TIMING AND FLOW */
+.dark .kenang-letter-1 {
+  color: #ffffff;
+  text-shadow: 0 0 3px #ffffff, 0 0 6px #ec4899, 0 0 12px #ec4899;
+  animation: letterGlowWave 4s ease-in-out infinite;
+  animation-delay: 0s;
+}
+.dark .kenang-letter-2 {
+  color: #ffffff;
+  text-shadow: 0 0 3px #ffffff, 0 0 6px #ec4899, 0 0 12px #ec4899;
+  animation: letterGlowWave 4s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+.dark .kenang-letter-3 {
+  color: #ffffff;
+  text-shadow: 0 0 3px #ffffff, 0 0 6px #ec4899, 0 0 12px #ec4899;
+  animation: letterGlowWave 4s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+.dark .kenang-letter-4 {
+  color: #ffffff;
+  text-shadow: 0 0 3px #ffffff, 0 0 6px #ec4899, 0 0 12px #ec4899;
+  animation: letterGlowWave 4s ease-in-out infinite;
+  animation-delay: 0.9s;
+}
+.dark .kenang-letter-5 {
+  color: #ffffff;
+  text-shadow: 0 0 3px #ffffff, 0 0 6px #ec4899, 0 0 12px #ec4899;
+  animation: letterGlowWave 4s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+.dark .kenang-letter-6 {
+  color: #ffffff;
+  text-shadow: 0 0 3px #ffffff, 0 0 6px #ec4899, 0 0 12px #ec4899;
+  animation: letterGlowWave 4s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+/* Light mode wave animation - HORIZONTAL FLOW */
+@keyframes letterWave {
+  0%, 70%, 100% {
+    transform: translateY(0px) scale(1);
+    color: #ec4899;
+    filter: brightness(1);
+  }
+  
+  /* Wave peak - each letter rises at different times creating horizontal flow */
+  15% {
+    transform: translateY(-12px) scale(1.15);
+    color: #be185d;
+    filter: brightness(1.4);
+  }
+  
+  /* Wave descent */
+  30% {
+    transform: translateY(-6px) scale(1.08);
+    color: #db2777;
+    filter: brightness(1.2);
+  }
+}
+
+/* Dark mode glow wave animation - EXACT SAME MOVEMENT PATTERN */
+@keyframes letterGlowWave {
+  0%, 70%, 100% {
+    transform: translateY(0px) scale(1);
+    color: #ffffff;
+    text-shadow: 
+      0 0 3px #ffffff,
+      0 0 6px #ec4899,
+      0 0 12px #ec4899;
+    filter: brightness(1);
+  }
+  
+  /* Wave peak - SAME TIMING AS LIGHT MODE */
+  15% {
+    transform: translateY(-12px) scale(1.15);
+    color: #fce7f3;
+    text-shadow: 
+      0 0 8px #ffffff,
+      0 0 16px #ec4899,
+      0 0 24px #ec4899,
+      0 0 32px #be185d,
+      0 0 40px #be185d;
+    filter: brightness(1.6);
+  }
+  
+  /* Wave descent - SAME TIMING AS LIGHT MODE */
+  30% {
+    transform: translateY(-6px) scale(1.08);
+    color: #f9a8d4;
+    text-shadow: 
+      0 0 6px #ffffff,
+      0 0 12px #ec4899,
+      0 0 18px #ec4899,
+      0 0 24px #be185d;
+    filter: brightness(1.3);
+  }
+}
