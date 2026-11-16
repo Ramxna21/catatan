@@ -1,123 +1,130 @@
-# 🌸 Kenang - Love Diary Application
+# 🌸 Kenang — Catatan Hati
 
-Aplikasi diary digital yang indah dan personal untuk menyimpan kenangan, catatan romantis, dan momen berharga dalam hidup Anda.
+Aplikasi diary digital yang personal untuk menyimpan kenangan, memantau mood, dan merawat kebiasaan menulis. Dibangun dengan React + TypeScript + Tailwind CSS, berjalan sepenuhnya di browser tanpa server.
 
-## ✨ Fitur Utama
+## ✨ Fitur
 
-### 📝 **Core Features**
-- **Tulis Kenangan**: Interface yang indah untuk menulis catatan personal
-- **Mood Tracking**: Lacak mood dengan emoji dan warna yang menarik
-- **Tag System**: Organisir catatan dengan sistem tag yang fleksibel
-- **Privacy Control**: Atur catatan sebagai pribadi atau publik
-- **Dark/Light Mode**: Tema yang dapat disesuaikan dengan preferensi
+### 📝 Menulis & membaca
+- Editor catatan dengan **mood**, **tag**, dan pengaturan **pribadi/publik**
+- **Pembaca catatan penuh** — klik kartu untuk membaca seluruh isi, lengkap dengan estimasi waktu baca dan jumlah kata
+- **Autosave draft** per akun, dengan opsi memulihkan atau memulai draft baru
+- Pintasan **Ctrl/Cmd + S** untuk menyimpan, penghitung kata/karakter, dan validasi form
+- Pencarian instan berdasarkan judul, isi, atau tag (`#tag`)
+- Filter lanjutan: mood, tag, tanggal, privasi, panjang isi, dan urutan
 
-### 🔍 **Advanced Search & Filter**
-- **Smart Search**: Cari berdasarkan judul, isi, atau tag
-- **Advanced Filters**: Filter berdasarkan mood, tanggal, privasi, dan panjang konten
-- **Real-time Results**: Hasil pencarian yang responsif dan cepat
+### 👤 Akun & Keamanan dengan OTP Gmail
+- Registrasi akun aman dengan verifikasi **Kode OTP 6 Digit** ke alamat Gmail
+- Dilengkapi timer hitung mundur kirim ulang OTP (60s) dan auto-focus digit
+- Integrasi pengiriman email OTP via **EmailJS REST API** serta fallback simulasi instan di lingkungan pengembangan
+- Login dan registrasi dengan **password yang di-hash** (PBKDF2-SHA-256, 120.000 iterasi)
+- Data catatan, surat masa depan, draft, dan riwayat AI **terpisah per akun**
+- Migrasi otomatis data versi lama saat pertama kali dibuka
+- Sinkronisasi antar tab: catatan dan status login ikut memperbarui
 
-### 📊 **Analytics & Insights**
-- **Mood Analytics**: Analisis mendalam tentang pola mood Anda
-- **Writing Statistics**: Statistik menulis dan tren produktivitas
-- **Memory Timeline**: Perjalanan waktu melalui catatan-catatan Anda
-- **Smart Insights**: Rekomendasi personal berdasarkan pola menulis
+### 💌 Surat Masa Depan (Kapsul Waktu)
+- Tulis surat, doa, atau pesan untuk dirimu di masa depan (misal: 1 bulan, 3 bulan, 6 bulan, 1 tahun, atau tanggal kustom seperti 17 November)
+- **Segel Kapsul Waktu**: Surat terkunci rapat dan isinya tidak bisa diintip sebelum waktu yang ditentukan tiba
+- **Live Countdown Timer**: Penghitung mundur hari, jam, menit, dan detik yang berjalan real-time pada setiap kartu surat
+- **Pengingat Kalender & Gmail**:
+  - Tombol 1-klik untuk memasang jadwal di **Google Calendar** (otomatis memicu alarm & notifikasi Gmail)
+  - Opsi download file pengingat kalender `.ics` untuk Apple Calendar, Outlook, dan aplikasi kalender lainnya
+- Konversi otomatis menjadi catatan harian biasa begitu kapsul waktu berhasil dibuka
 
-### 🤖 **AI Assistant (NEW!)**
-- **Real AI Chat**: Powered by Google Gemini 1.5 Flash
-- **Context-Aware**: AI yang memahami konteks dari catatan-catatan Anda
-- **Emotional Support**: Dukungan emosional yang genuine dan empathetic
-- **Writing Coach**: Bantuan menulis yang personal dan inspiratif
-- **Multiple Personalities**: Pilih gaya AI (Supportive, Creative, Analytical)
+### 📊 Insight
+- **Dashboard** dengan ringkasan total catatan, streak menulis, jumlah kata, dan mood favorit
+- **Statistik** produktivitas menulis
+- **Mood Analytics** untuk melihat pola emosi
+- **Memory Timeline** per minggu/bulan/tahun
+- **Smart Reminders** dengan notifikasi browser
 
-### 🔔 **Smart Reminders**
-- **Intelligent Notifications**: Pengingat cerdas berdasarkan pola menulis
-- **Custom Schedules**: Atur jadwal reminder yang fleksibel
-- **Template Library**: Template reminder siap pakai
-- **Browser Notifications**: Notifikasi real-time di browser
+### 🤖 AI Assistant (Google Gemini)
+- Menggunakan model cerdas **Google Gemini 3.8 Flash** sebagai mesin default
+- **Konfigurasi API Key Aman**: API Key dimuat melalui file `.env` (`VITE_GEMINI_API_KEY`) dan tidak dipajang secara terbuka di antarmuka
+- **Ide siap pakai** — setiap saran ide punya tombol **“Tulis catatan ini”** yang langsung membuka editor dengan judul, isi pembuka, mood, dan tag terisi
+- Memahami konteks catatan terbaru dan bisa menjadi teman curhat, editor, maupun writing coach
+- Tiga gaya respons: Suportif, Kreatif, Analitis
+- Pengaturan dan riwayat chat tersimpan lokal serta terpisah per akun
 
-### 💾 **Data Management**
-- **Backup & Restore**: Sistem backup yang aman dan mudah
-- **Export Options**: Export dalam format JSON, TXT, atau CSV
-- **Share Features**: Bagikan catatan publik ke media sosial
-- **Local Storage**: Data tersimpan aman di browser Anda
+### 💾 Data & keamanan
+- Backup/restore JSON dan export **JSON/TXT/CSV**
+- Bagikan catatan publik sebagai teks atau gambar
+- Undo hapus catatan lewat notifikasi
+- Tema terang/gelap mengikuti preferensi sistem dan tersimpan otomatis
+- Responsif di mobile, tablet, dan desktop
 
-### 🎨 **Beautiful Design**
-- **Modern UI**: Desain yang clean dan modern dengan Tailwind CSS
-- **Smooth Animations**: Animasi yang halus dan responsif
-- **Responsive Design**: Tampil sempurna di semua perangkat
-- **Accessibility**: Desain yang accessible untuk semua pengguna
+## 🚀 Menjalankan
 
-## 🚀 Setup AI Chat
+```bash
+npm install
+npm run dev
+```
 
-Untuk menggunakan fitur AI Chat yang canggih:
+Buka alamat yang ditampilkan Vite (biasanya `http://localhost:5173`).
 
-1. **Dapatkan Gemini API Key** (GRATIS):
-   - Kunjungi [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Daftar akun gratis (tanpa perlu kartu kredit)
-   - Buat API key baru
-   - Copy API key Anda
+### Script
 
-2. **Setup di Aplikasi**:
-   - Buka AI Chat dengan klik tombol chat di header
-   - Klik ikon Settings (⚙️)
-   - Masukkan Gemini API key Anda
-   - Pilih AI personality yang diinginkan
-   - Klik "Simpan Pengaturan"
+```bash
+npm run dev        # Development server
+npm run build      # Type-check + build produksi
+npm run typecheck  # Type-check saja
+npm run lint       # ESLint
+npm run preview    # Preview hasil build
+```
 
-3. **Mulai Chat**:
-   - AI sudah siap membantu Anda!
-   - Coba tanyakan: "Bantu aku menulis catatan hari ini"
-   - AI akan memberikan respon yang personal berdasarkan catatan-catatan Anda
+## 🤖 Menggunakan Asisten AI
+
+**Mode Lokal (tanpa API key)** — langsung bisa dipakai:
+
+1. Buka **AI Chat** dari header (atau menu di mobile).
+2. Klik salah satu tombol cepat, mis. **“Beri aku ide menulis”**.
+3. Pilih ide yang menarik lalu klik **“Tulis catatan ini”** — editor langsung terisi.
+4. Kamu juga bisa menulis bebas: curhat, minta pertanyaan refleksi, saran judul, atau ringkasan pola catatan.
+
+**Mode Online (opsional)**:
+
+1. Buat API key di [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. Anda bisa memasukkan API key dengan 2 cara:
+   - **Lewat file `.env`**: Salin `.env.example` menjadi `.env`, lalu isi `VITE_GEMINI_API_KEY=AIzaSy...` (otomatis aktif untuk semua sesi).
+   - **Lewat Pengaturan Aplikasi**: Buka **AI Chat** → ikon **Settings (⚙️)** → pilih **Online (AI)**, tempel API key, lalu klik Simpan.
+3. Mulai chat, misalnya: *"Bantu aku mencari ide catatan tentang hari ini."*
+
+Catatan: pada Mode Online, ringkasan catatan terbaru dikirim ke Google Gemini saat kamu mengirim pesan. Mode Lokal tidak mengirim data ke mana pun. Jangan gunakan Mode Online untuk catatan yang tidak ingin dibagikan ke pihak ketiga.
+
+## 🔐 Model penyimpanan
+
+Semua data berada di `localStorage` browser:
+
+| Key | Isi |
+| --- | --- |
+| `kenang.accounts.v1` | Daftar akun (password berupa hash + salt) |
+| `kenang.session.v1` | ID akun yang sedang login |
+| `kenang.entries.v1:<userId>` | Catatan per akun |
+| `kenang.futureLetters.v1:<userId>` | Surat masa depan (kapsul waktu) per akun |
+| `kenang.draft.v1:<userId>` | Draft editor per akun |
+| `kenang.darkMode.v1` | Preferensi tema |
+| `kenang.aiSettings.v2:<userId>` | Mode, gaya bicara, model Gemini, dan API key per akun |
+| `kenang.aiMessages.v2:<userId>` | Riwayat chat AI per akun |
+
+Catatan **tidak dienkripsi**, hanya dilindungi oleh isolasi akun di browser. Siapa pun yang memiliki akses ke profil browser ini dapat membuka data. Gunakan **Backup** secara rutin dan hindari aplikasi ini untuk data yang sangat sensitif.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18 + TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **AI**: Google Gemini 1.5 Flash
-- **Build Tool**: Vite
-- **Storage**: Browser LocalStorage
+- React 18 + TypeScript
+- Vite
+- Tailwind CSS + Lucide React
+- Web Crypto API (PBKDF2) untuk hashing password
+- Mesin asisten lokal berbasis aturan (tanpa server) + Google Gemini API opsional
+- Browser LocalStorage
 
-## 🎯 Target Audience
+## 🎯 Untuk siapa?
 
-- Pasangan yang ingin menyimpan kenangan romantis
-- Individu yang suka journaling dan self-reflection
-- Siapa saja yang ingin tracking mood dan emotional wellness
-- Penulis yang butuh inspirasi dan dukungan AI
-
-## 🌟 Keunggulan
-
-1. **AI yang Benar-benar Cerdas**: Bukan template responses, tapi AI yang memahami konteks personal Anda
-2. **Privacy First**: Data tersimpan lokal, Anda yang mengontrol penuh
-3. **Beautiful & Intuitive**: UI/UX yang dirancang dengan perhatian detail
-4. **Comprehensive Features**: Dari basic writing sampai advanced analytics
-5. **Free to Use**: Gratis dengan fitur lengkap (hanya perlu API key gratis)
-
-## 📱 Responsive Design
-
-Aplikasi ini fully responsive dan bekerja sempurna di:
-- 📱 Mobile phones
-- 📱 Tablets
-- 💻 Laptops
-- 🖥️ Desktop computers
-
-## 🔒 Privacy & Security
-
-- **Local Storage**: Semua data tersimpan di browser Anda
-- **No Server**: Tidak ada data yang dikirim ke server kami
-- **API Key Control**: Anda yang mengontrol API key untuk AI
-- **Privacy Settings**: Kontrol penuh atas privasi setiap catatan
-
-## 🎨 Customization
-
-- **Dark/Light Mode**: Tema yang dapat disesuaikan
-- **AI Personality**: Pilih gaya AI sesuai preferensi
-- **Reminder Settings**: Atur pengingat sesuai kebutuhan
-- **Export Formats**: Berbagai format export tersedia
+- Individu yang suka journaling dan refleksi diri
+- Pasangan yang ingin menyimpan kenangan bersama
+- Penulis yang butuh ruang latihan dan teman brainstorming
+- Siapa pun yang ingin melacak mood dan kebiasaan menulis
 
 ---
 
-**Catatan Hati** - Tempat di mana setiap kata memiliki makna, setiap kenangan tersimpan indah, dan setiap perasaan mendapat dukungan dari AI yang peduli. 💕
-**Kenang** - Tempat di mana setiap kata memiliki makna, setiap kenangan tersimpan indah, dan setiap perasaan mendapat dukungan dari AI yang peduli. 💕
+**Kenang** — tempat setiap rasa punya rumah. 💕
 
-*Dibuat dengan cinta untuk setiap kisah yang berharga* ✨
+*Dibuat dengan cinta untuk setiap kisah yang berharga.*

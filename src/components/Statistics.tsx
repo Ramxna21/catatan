@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { BarChart3, TrendingUp, Calendar, Heart, PieChart, Clock, Target, Award, RefreshCw } from 'lucide-react';
 import { DiaryEntry } from '../types';
+import { getWritingStreak } from '../lib/moods';
 
 interface StatisticsProps {
   entries: DiaryEntry[];
@@ -9,16 +10,9 @@ interface StatisticsProps {
 const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year' | 'all'>('month');
   const [lastUpdateTime, setLastUpdateTime] = useState<string>('');
-  const [debugInfo, setDebugInfo] = useState<string>('');
-  const [forceUpdate, setForceUpdate] = useState(0);
 
-  // Force re-render when entries change
   useEffect(() => {
     setLastUpdateTime(new Date().toLocaleTimeString('id-ID'));
-    setDebugInfo(`Received ${entries?.length || 0} entries at ${new Date().toLocaleTimeString()}`);
-    setForceUpdate(prev => prev + 1);
-    console.log('Statistics useEffect - entries:', entries);
-    console.log('Statistics useEffect - entries length:', entries?.length);
   }, [entries]);
 
   // DIRECT CALCULATION - No complex filtering first
@@ -38,7 +32,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
         averageWords: 0,
         moodCounts: {},
         tagCounts: {},
-        writingStreak: 0,
+        writingStreak: getWritingStreak(entries),
         privateEntries: 0,
         publicEntries: 0,
         longestEntry: null
@@ -85,7 +79,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
     const publicEntries = entries.filter(entry => entry && entry.isPrivate === false).length;
     console.log('Privacy counts (direct):', { privateEntries, publicEntries });
 
-    const longestEntry = entries.reduce((longest, entry) => {
+    const longestEntry = entries.reduce<DiaryEntry | null>((longest, entry) => {
       if (!entry || !entry.content) return longest;
       if (!longest || !longest.content) return entry;
       return entry.content.length > longest.content.length ? entry : longest;
@@ -98,7 +92,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
       averageWords,
       moodCounts,
       tagCounts,
-      writingStreak: 0, // Simplified for now
+      writingStreak: getWritingStreak(entries), // Dihitung dari hari unik catatan
       privateEntries,
       publicEntries,
       longestEntry
@@ -106,7 +100,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
 
     console.log('=== FINAL DIRECT STATS ===', result);
     return result;
-  }, [entries, forceUpdate]);
+  }, [entries]);
 
   // Filtered entries based on time range
   const filteredEntries = useMemo(() => {
@@ -116,7 +110,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
     let filtered = [...entries];
     
     switch (timeRange) {
-      case 'week':
+      case 'week': {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         filtered = filtered.filter(entry => {
           try {
@@ -126,7 +120,8 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
           }
         });
         break;
-      case 'month':
+      }
+      case 'month': {
         const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
         filtered = filtered.filter(entry => {
           try {
@@ -136,7 +131,8 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
           }
         });
         break;
-      case 'year':
+      }
+      case 'year': {
         const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
         filtered = filtered.filter(entry => {
           try {
@@ -146,6 +142,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
           }
         });
         break;
+      }
       default:
         // 'all' - no filtering
         break;
@@ -196,7 +193,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
       writingStreak: directStats.writingStreak,
       privateEntries: filteredEntries.filter(e => e && e.isPrivate === true).length,
       publicEntries: filteredEntries.filter(e => e && e.isPrivate === false).length,
-      longestEntry: filteredEntries.reduce((longest, entry) => {
+      longestEntry: filteredEntries.reduce<DiaryEntry | null>((longest, entry) => {
         if (!entry || !entry.content) return longest;
         if (!longest || !longest.content) return entry;
         return entry.content.length > longest.content.length ? entry : longest;
@@ -275,12 +272,6 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
           <p className="text-gray-600 dark:text-gray-300 mt-2">
             Analisis pola dan tren dalam catatan hati Anda
           </p>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Debug: {debugInfo}
-          </div>
-          <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-            Raw entries: {entries?.length || 0} | Filtered: {filteredEntries?.length || 0} | Stats total: {statistics.totalEntries}
-          </div>
           {lastUpdateTime && (
             <div className="flex items-center space-x-2 mt-1">
               <RefreshCw className="h-3 w-3 text-green-500" />
@@ -295,7 +286,7 @@ const Statistics: React.FC<StatisticsProps> = ({ entries }) => {
           <Calendar className="h-5 w-5 text-gray-500" />
           <select
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as any)}
+            onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'year' | 'all')}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white transition-all duration-300"
           >
             <option value="week">Minggu Ini</option>

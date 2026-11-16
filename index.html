@@ -1,11 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kenang - Love Diary Application</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <meta
+      name="description"
+      content="Kenang — catatan hati pribadi untuk menyimpan kenangan, memantau mood, dan merawat tulisan Anda. Data tersimpan di perangkat sendiri."
+    />
+    <meta name="theme-color" content="#ec4899" />
+    <link rel="icon" type="image/png" href="/image.png" />
+    <title>Kenang — Catatan Hati</title>
+    <script>
+      // Terapkan tema sebelum render agar tidak terjadi flash terang/gelap.
+      (function () {
+        try {
+          var stored = localStorage.getItem('kenang.darkMode.v1');
+          var legacy = localStorage.getItem('catatanHatiDarkMode');
+          var dark = stored
+            ? JSON.parse(stored)
+            : legacy
+              ? JSON.parse(legacy)
+              : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (error) {
+          /* preferensi tema tidak penting; abaikan */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

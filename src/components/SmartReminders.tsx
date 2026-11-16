@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Clock, Calendar, Heart, Settings, Plus, X, Check, AlertCircle } from 'lucide-react';
+import { Bell, Clock, Calendar, Plus, X, Check, AlertCircle } from 'lucide-react';
 import { DiaryEntry } from '../types';
 
 interface Reminder {
@@ -84,6 +84,7 @@ const SmartReminders: React.FC<SmartRemindersProps> = ({ entries }) => {
 
     // Generate smart suggestions based on user patterns
     generateSmartSuggestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entries]);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ const SmartReminders: React.FC<SmartRemindersProps> = ({ entries }) => {
     
     // Schedule notifications
     scheduleNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reminders]);
 
   const generateSmartSuggestions = () => {
@@ -227,7 +229,7 @@ const SmartReminders: React.FC<SmartRemindersProps> = ({ entries }) => {
     setReminders(reminders.filter(reminder => reminder.id !== id));
   };
 
-  const useTemplate = (template: typeof reminderTemplates[0]) => {
+  const applyTemplate = (template: typeof reminderTemplates[0]) => {
     setNewReminder({
       title: template.title,
       message: template.message,
@@ -263,7 +265,7 @@ const SmartReminders: React.FC<SmartRemindersProps> = ({ entries }) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="animate-slide-up">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Smart Reminders
+            Pengingat Cerdas
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
             Pengingat cerdas untuk membantu konsistensi menulis catatan hati
@@ -310,7 +312,7 @@ const SmartReminders: React.FC<SmartRemindersProps> = ({ entries }) => {
             <div
               key={index}
               className="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 border border-pink-200 dark:border-pink-700 rounded-lg p-4 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-              onClick={() => useTemplate(template)}
+              onClick={() => applyTemplate(template)}
             >
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-300">

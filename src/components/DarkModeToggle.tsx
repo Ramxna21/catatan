@@ -20,7 +20,9 @@ const DarkModeToggle: React.FC<DarkModeToggleProps> = ({ darkMode, onToggle }) =
   return (
     <button
       onClick={handleToggle}
-      className="relative p-3 rounded-full overflow-hidden transition-all duration-300 hover:scale-110 active:scale-95 group"
+      aria-label={darkMode ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+      title={darkMode ? 'Mode terang' : 'Mode gelap'}
+      className="relative rounded-full p-3 transition-all duration-300 hover:scale-110 active:scale-95 group"
       style={{
         background: darkMode 
           ? 'linear-gradient(135deg, #1f2937, #374151)' 

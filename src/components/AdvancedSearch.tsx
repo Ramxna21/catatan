@@ -1,6 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Calendar, Filter, X, Tag, Clock, Heart, SlidersHorizontal } from 'lucide-react';
-import { DiaryEntry } from '../types';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Search, Calendar, Filter, X, Tag, Heart, SlidersHorizontal } from 'lucide-react';
+import { DiaryEntry, Mood } from '../types';
+
+type DateRange = 'all' | 'week' | 'month' | 'year' | 'custom';
+type PrivacyFilter = 'all' | 'private' | 'public';
+type SortBy = 'newest' | 'oldest' | 'title' | 'mood';
+type ContentLength = 'all' | 'short' | 'medium' | 'long';
+
+interface SearchFilters {
+  moods: Mood[];
+  tags: string[];
+  dateRange: DateRange;
+  customStartDate: string;
+  customEndDate: string;
+  privacy: PrivacyFilter;
+  sortBy: SortBy;
+  contentLength: ContentLength;
+}
+
+const DEFAULT_FILTERS: SearchFilters = {
+  moods: [],
+  tags: [],
+  dateRange: 'all',
+  customStartDate: '',
+  customEndDate: '',
+  privacy: 'all',
+  sortBy: 'newest',
+  contentLength: 'all'
+};
+
 
 interface AdvancedSearchProps {
   entries: DiaryEntry[];
@@ -16,18 +44,9 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   onSearchTermChange 
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [filters, setFilters] = useState({
-    moods: [] as string[],
-    tags: [] as string[],
-    dateRange: 'all' as 'all' | 'week' | 'month' | 'year' | 'custom',
-    customStartDate: '',
-    customEndDate: '',
-    privacy: 'all' as 'all' | 'private' | 'public',
-    sortBy: 'newest' as 'newest' | 'oldest' | 'title' | 'mood',
-    contentLength: 'all' as 'all' | 'short' | 'medium' | 'long'
-  });
+  const [filters, setFilters] = useState<SearchFilters>(DEFAULT_FILTERS);
 
-  const moods = [
+  const moods: { value: Mood; label: string; emoji: string; color: string }[] = [
     { value: 'love', label: 'Cinta', emoji: '💕', color: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200' },
     { value: 'happy', label: 'Bahagia', emoji: '😊', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
     { value: 'sad', label: 'Sedih', emoji: '😢', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
@@ -38,12 +57,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   // Get all unique tags from entries
   const allTags = Array.from(new Set(entries.flatMap(entry => entry.tags)));
 
-  useEffect(() => {
-    const filtered = getFilteredEntries();
-    onFilteredResults(filtered);
-  }, [searchTerm, filters, entries]);
-
-  const getFilteredEntries = () => {
+  const filteredEntries = useMemo(() => {
     let filtered = [...entries];
 
     // Text search
@@ -52,7 +66,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
       filtered = filtered.filter(entry => {
         const titleMatch = entry.title.toLowerCase().includes(searchLower);
         const contentMatch = entry.content.toLowerCase().includes(searchLower);
-        const tagMatch = entry.tags.some(tag => 
+        const tagMatch = entry.tags.some(tag =>
           tag.toLowerCase().includes(searchLower) ||
           searchLower.includes(`#${tag.toLowerCase()}`)
         );
@@ -67,14 +81,14 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
     // Tag filter
     if (filters.tags.length > 0) {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         filters.tags.some(tag => entry.tags.includes(tag))
       );
     }
 
     // Privacy filter
     if (filters.privacy !== 'all') {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         filters.privacy === 'private' ? entry.isPrivate : !entry.isPrivate
       );
     }
@@ -82,18 +96,21 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     // Date range filter
     const now = new Date();
     switch (filters.dateRange) {
-      case 'week':
+      case 'week': {
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         filtered = filtered.filter(entry => new Date(entry.createdAt) >= weekAgo);
         break;
-      case 'month':
+      }
+      case 'month': {
         const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
         filtered = filtered.filter(entry => new Date(entry.createdAt) >= monthAgo);
         break;
-      case 'year':
+      }
+      case 'year': {
         const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
         filtered = filtered.filter(entry => new Date(entry.createdAt) >= yearAgo);
         break;
+      }
       case 'custom':
         if (filters.customStartDate) {
           filtered = filtered.filter(entry => new Date(entry.createdAt) >= new Date(filters.customStartDate));
@@ -133,9 +150,14 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
     }
 
     return filtered;
-  };
+  }, [entries, filters, searchTerm]);
 
-  const handleMoodToggle = (mood: string) => {
+  useEffect(() => {
+    onFilteredResults(filteredEntries);
+  }, [filteredEntries, onFilteredResults]);
+
+
+  const handleMoodToggle = (mood: Mood) => {
     setFilters(prev => ({
       ...prev,
       moods: prev.moods.includes(mood) 
@@ -154,16 +176,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   };
 
   const clearAllFilters = () => {
-    setFilters({
-      moods: [],
-      tags: [],
-      dateRange: 'all',
-      customStartDate: '',
-      customEndDate: '',
-      privacy: 'all',
-      sortBy: 'newest',
-      contentLength: 'all'
-    });
+    setFilters(DEFAULT_FILTERS);
     onSearchTermChange('');
   };
 
@@ -197,7 +210,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Cari dalam judul, isi, atau tag catatan..."
+            placeholder="Cari catatan, isi, atau tag..."
             value={searchTerm}
             onChange={(e) => onSearchTermChange(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300 focus:scale-105"
@@ -303,7 +316,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
               ].map((range) => (
                 <button
                   key={range.value}
-                  onClick={() => setFilters(prev => ({ ...prev, dateRange: range.value as any }))}
+                  onClick={() => setFilters(prev => ({ ...prev, dateRange: range.value as DateRange }))}
                   className={`p-2 rounded-lg border text-sm transition-all duration-300 hover:scale-105 ${
                     filters.dateRange === range.value
                       ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300'
@@ -352,7 +365,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
               </h4>
               <select
                 value={filters.privacy}
-                onChange={(e) => setFilters(prev => ({ ...prev, privacy: e.target.value as any }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, privacy: e.target.value as PrivacyFilter }))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="all">Semua</option>
@@ -368,7 +381,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
               </h4>
               <select
                 value={filters.contentLength}
-                onChange={(e) => setFilters(prev => ({ ...prev, contentLength: e.target.value as any }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, contentLength: e.target.value as ContentLength }))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="all">Semua</option>
@@ -385,7 +398,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
               </h4>
               <select
                 value={filters.sortBy}
-                onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as any }))}
+                onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as SortBy }))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="newest">Terbaru</option>
@@ -404,7 +417,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
           <div className="flex items-center space-x-2">
             <Filter className="h-4 w-4" />
             <span>
-              Menampilkan {getFilteredEntries().length} dari {entries.length} catatan
+              Menampilkan {filteredEntries.length} dari {entries.length} catatan
             </span>
           </div>
           

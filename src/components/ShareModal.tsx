@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Copy, Share2, Facebook, Twitter, Instagram, MessageCircle, Download, Check, Heart, Sparkles, Eye } from 'lucide-react';
+import { X, Copy, Share2, Facebook, Twitter, MessageCircle, Download, Check, Sparkles, Eye } from 'lucide-react';
 import { ShareModalProps } from '../types';
 
 const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
@@ -29,34 +29,33 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
         return {
           title: entry.title,
           content: entry.content,
-          shareText: `📖 "${entry.title}"\n\n${entry.content}\n\n${getMoodEmoji(entry.mood)} ${entry.mood} • ${new Date(entry.createdAt).toLocaleDateString('id-ID')}\n\n💕 Dibagikan dari Catatan Hati`,
           shareText: `📖 "${entry.title}"\n\n${entry.content}\n\n${getMoodEmoji(entry.mood)} ${entry.mood} • ${new Date(entry.createdAt).toLocaleDateString('id-ID')}\n\n💕 Dibagikan dari Kenang`,
           description: 'Cerita lengkap dengan semua detail'
         };
       
-      case 'quote':
+      case 'quote': {
         // Extract the most meaningful sentence (first sentence or up to 100 chars)
         const sentences = entry.content.split(/[.!?]+/).filter(s => s.trim().length > 0);
         const bestQuote = sentences[0]?.trim() || entry.content.substring(0, 100) + '...';
         return {
           title: `"${bestQuote}"`,
           content: `- ${entry.title}`,
-          shareText: `✨ "${bestQuote}"\n\n- ${entry.title}\n${getMoodEmoji(entry.mood)} ${new Date(entry.createdAt).toLocaleDateString('id-ID')}\n\n💕 Kutipan dari Catatan Hati`,
           shareText: `✨ "${bestQuote}"\n\n- ${entry.title}\n${getMoodEmoji(entry.mood)} ${new Date(entry.createdAt).toLocaleDateString('id-ID')}\n\n💕 Kutipan dari Kenang`,
           description: 'Kutipan indah yang menyentuh hati'
         };
-      
-      case 'minimal':
+      }
+
+      case 'minimal': {
         const shortContent = entry.content.length > 80 
           ? entry.content.substring(0, 80) + '...' 
           : entry.content;
         return {
           title: entry.title,
           content: shortContent,
-          shareText: `💭 ${entry.title}\n\n${shortContent}\n\n${getMoodEmoji(entry.mood)} ${new Date(entry.createdAt).toLocaleDateString('id-ID')} • Catatan Hati 💕`,
           shareText: `💭 ${entry.title}\n\n${shortContent}\n\n${getMoodEmoji(entry.mood)} ${new Date(entry.createdAt).toLocaleDateString('id-ID')} • Kenang 💕`,
           description: 'Ringkasan singkat dan padat'
         };
+      }
       
       default:
         return {
@@ -69,7 +68,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
   };
 
   const formatData = getFormattedContent();
-  const shareUrl = `${window.location.origin}/story/${entry.id}?format=${selectedFormat}`;
+  const shareUrl = `${window.location.origin}${window.location.pathname}#beranda`;
 
   const handleCopyLink = async () => {
     try {
@@ -96,7 +95,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
         shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
         break;
       case 'twitter':
-        shareLink = `https://twitter.intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+        shareLink = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
         break;
       case 'whatsapp':
         shareLink = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
@@ -245,7 +244,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
     // Download the image
     const link = document.createElement('a');
     const formatName = selectedFormat === 'story' ? 'cerita' : selectedFormat === 'quote' ? 'kutipan' : 'ringkas';
-    link.download = `catatan-hati-${formatName}-${entry.title.replace(/\s+/g, '-').toLowerCase()}.png`;
+    link.download = `kenang-${formatName}-${entry.title.replace(/\s+/g, '-').toLowerCase()}.png`;
     link.href = canvas.toDataURL();
     link.click();
   };
@@ -330,7 +329,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
             ].map((format) => (
               <button
                 key={format.id}
-                onClick={() => setSelectedFormat(format.id as any)}
+                onClick={() => setSelectedFormat(format.id as 'story' | 'quote' | 'minimal')}
                 className={`p-4 rounded-lg border-2 transition-all duration-300 hover:scale-105 text-left ${
                   selectedFormat === format.id
                     ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 shadow-lg'
@@ -383,7 +382,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, entry, onClose }) => {
                   <span>{new Date(entry.createdAt).toLocaleDateString('id-ID')}</span>
                 </div>
                 <div className="text-center mt-3 text-xs text-white/60">
-                  💕 Catatan Hati
+                  💕 Kenang
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, BookOpen, Lock, Share2, Moon, Sun, Sparkles, Star } from 'lucide-react';
+import { Heart, BookOpen, Lock, Share2, Sparkles, Star } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 
 interface LandingPageProps {

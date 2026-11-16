@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, Heart, Clock, MapPin, Users, Star, Filter, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, Star, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { DiaryEntry } from '../types';
 
 interface MemoryTimelineProps {
@@ -53,11 +53,12 @@ const MemoryTimeline: React.FC<MemoryTimelineProps> = ({ entries }) => {
         case 'month':
           groupKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
           break;
-        case 'week':
+        case 'week': {
           const weekStart = new Date(date);
           weekStart.setDate(date.getDate() - date.getDay());
           groupKey = weekStart.toISOString().split('T')[0];
           break;
+        }
       }
 
       if (!acc[groupKey]) {
@@ -104,18 +105,20 @@ const MemoryTimeline: React.FC<MemoryTimelineProps> = ({ entries }) => {
     switch (viewMode) {
       case 'year':
         return `Tahun ${period}`;
-      case 'month':
+      case 'month': {
         const [year, month] = period.split('-');
         const monthNames = [
           'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
         ];
         return `${monthNames[parseInt(month) - 1]} ${year}`;
-      case 'week':
+      }
+      case 'week': {
         const weekStart = new Date(period);
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekStart.getDate() + 6);
         return `${weekStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} - ${weekEnd.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+      }
       default:
         return period;
     }
@@ -242,7 +245,7 @@ const MemoryTimeline: React.FC<MemoryTimelineProps> = ({ entries }) => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="animate-slide-up">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Memory Timeline
+            Garis Waktu Kenangan
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
             Perjalanan waktu melalui catatan hati Anda
@@ -260,7 +263,7 @@ const MemoryTimeline: React.FC<MemoryTimelineProps> = ({ entries }) => {
             </label>
             <select
               value={viewMode}
-              onChange={(e) => setViewMode(e.target.value as any)}
+              onChange={(e) => setViewMode(e.target.value as 'year' | 'month' | 'week')}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="week">Per Minggu</option>

@@ -47,18 +47,19 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   const styles = getTypeStyles();
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[70] animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="confirm-dialog-title">
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full shadow-2xl animate-scale-in">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             <AlertTriangle className={`h-6 w-6 ${styles.icon} animate-bounce-gentle`} />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 id="confirm-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white">
               {title}
             </h3>
           </div>
           <button
             onClick={onCancel}
             className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-110 active:scale-95"
+            aria-label="Tutup dialog"
           >
             <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
           </button>

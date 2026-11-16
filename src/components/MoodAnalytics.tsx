@@ -6,6 +6,71 @@ interface MoodAnalyticsProps {
   entries: DiaryEntry[];
 }
 
+const getMostProductiveDay = (entries: DiaryEntry[]) => {
+  const dayCount = entries.reduce((acc, entry) => {
+    const day = new Date(entry.createdAt).toLocaleDateString('id-ID', { weekday: 'long' });
+    acc[day] = (acc[day] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return Object.entries(dayCount).sort(([, a], [, b]) => b - a)[0];
+};
+
+const getAverageWordsPerMood = (entries: DiaryEntry[]) => {
+  const moodWords = entries.reduce((acc, entry) => {
+    const wordCount = entry.content.trim() ? entry.content.trim().split(/\s+/).length : 0;
+    if (!acc[entry.mood]) {
+      acc[entry.mood] = { total: 0, count: 0 };
+    }
+    acc[entry.mood].total += wordCount;
+    acc[entry.mood].count++;
+    return acc;
+  }, {} as Record<string, { total: number; count: number }>);
+
+  return Object.entries(moodWords).map(([mood, data]) => ({
+    mood,
+    average: Math.round(data.total / data.count)
+  })).sort((a, b) => b.average - a.average);
+};
+
+const getMoodStreaks = (entries: DiaryEntry[]) => {
+  if (entries.length === 0) return [];
+
+  const sortedEntries = [...entries].sort((a, b) =>
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
+
+  const streaks: { mood: string; length: number; startDate: string; endDate: string }[] = [];
+  let currentStreak = { mood: sortedEntries[0].mood, length: 1, startDate: sortedEntries[0].createdAt };
+
+  for (let i = 1; i < sortedEntries.length; i++) {
+    if (sortedEntries[i].mood === currentStreak.mood) {
+      currentStreak.length++;
+    } else {
+      if (currentStreak.length >= 3) {
+        streaks.push({
+          ...currentStreak,
+          endDate: sortedEntries[i - 1].createdAt
+        });
+      }
+      currentStreak = {
+        mood: sortedEntries[i].mood,
+        length: 1,
+        startDate: sortedEntries[i].createdAt
+      };
+    }
+  }
+
+  if (currentStreak.length >= 3) {
+    streaks.push({
+      ...currentStreak,
+      endDate: sortedEntries[sortedEntries.length - 1].createdAt
+    });
+  }
+
+  return streaks.sort((a, b) => b.length - a.length).slice(0, 3);
+};
+
 const MoodAnalytics: React.FC<MoodAnalyticsProps> = ({ entries }) => {
   const analytics = useMemo(() => {
     // Group entries by month for trend analysis
@@ -72,71 +137,6 @@ const MoodAnalytics: React.FC<MoodAnalyticsProps> = ({ entries }) => {
     };
   }, [entries]);
 
-  const getMostProductiveDay = (entries: DiaryEntry[]) => {
-    const dayCount = entries.reduce((acc, entry) => {
-      const day = new Date(entry.createdAt).toLocaleDateString('id-ID', { weekday: 'long' });
-      acc[day] = (acc[day] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return Object.entries(dayCount).sort(([,a], [,b]) => b - a)[0];
-  };
-
-  const getAverageWordsPerMood = (entries: DiaryEntry[]) => {
-    const moodWords = entries.reduce((acc, entry) => {
-      const wordCount = entry.content.split(/\s+/).length;
-      if (!acc[entry.mood]) {
-        acc[entry.mood] = { total: 0, count: 0 };
-      }
-      acc[entry.mood].total += wordCount;
-      acc[entry.mood].count++;
-      return acc;
-    }, {} as Record<string, { total: number; count: number }>);
-
-    return Object.entries(moodWords).map(([mood, data]) => ({
-      mood,
-      average: Math.round(data.total / data.count)
-    })).sort((a, b) => b.average - a.average);
-  };
-
-  const getMoodStreaks = (entries: DiaryEntry[]) => {
-    if (entries.length === 0) return [];
-    
-    const sortedEntries = [...entries].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-
-    const streaks: { mood: string; length: number; startDate: string; endDate: string }[] = [];
-    let currentStreak = { mood: sortedEntries[0].mood, length: 1, startDate: sortedEntries[0].createdAt };
-
-    for (let i = 1; i < sortedEntries.length; i++) {
-      if (sortedEntries[i].mood === currentStreak.mood) {
-        currentStreak.length++;
-      } else {
-        if (currentStreak.length >= 3) {
-          streaks.push({
-            ...currentStreak,
-            endDate: sortedEntries[i - 1].createdAt
-          });
-        }
-        currentStreak = {
-          mood: sortedEntries[i].mood,
-          length: 1,
-          startDate: sortedEntries[i].createdAt
-        };
-      }
-    }
-
-    if (currentStreak.length >= 3) {
-      streaks.push({
-        ...currentStreak,
-        endDate: sortedEntries[sortedEntries.length - 1].createdAt
-      });
-    }
-
-    return streaks.sort((a, b) => b.length - a.length).slice(0, 3);
-  };
-
   const getMoodEmoji = (mood: string) => {
     switch (mood) {
       case 'love': return '💕';
@@ -159,12 +159,6 @@ const MoodAnalytics: React.FC<MoodAnalyticsProps> = ({ entries }) => {
     }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 4) return 'text-green-600 dark:text-green-400';
-    if (score >= 3) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
-  };
-
   const getScoreLabel = (score: number) => {
     if (score >= 4.5) return 'Sangat Positif';
     if (score >= 4) return 'Positif';
@@ -175,6 +169,14 @@ const MoodAnalytics: React.FC<MoodAnalyticsProps> = ({ entries }) => {
 
   return (
     <div className="space-y-8">
+      <div className="animate-slide-up">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Analitik Mood
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">
+          Pahami pola emosi dan suasana hati dari catatan Anda
+        </p>
+      </div>
       {/* Mood Score Overview */}
       <div className="bg-gradient-to-br from-pink-500 to-purple-600 text-white rounded-2xl p-8 shadow-xl animate-slide-up">
         <div className="flex items-center justify-between mb-6">

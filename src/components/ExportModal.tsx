@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Download, FileText, Calendar, Filter, Check, AlertCircle } from 'lucide-react';
+import { X, Download, Filter, Check, AlertCircle } from 'lucide-react';
 import { DiaryEntry } from '../types';
 
 interface ExportModalProps {
@@ -44,14 +44,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, entries, onClose }) =
     // Filter by date range
     const now = new Date();
     switch (dateRange) {
-      case 'month':
+      case 'month': {
         const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
         filtered = filtered.filter(entry => new Date(entry.createdAt) >= monthAgo);
         break;
-      case 'year':
+      }
+      case 'year': {
         const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
         filtered = filtered.filter(entry => new Date(entry.createdAt) >= yearAgo);
         break;
+      }
       case 'custom':
         if (customStartDate) {
           filtered = filtered.filter(entry => new Date(entry.createdAt) >= new Date(customStartDate));
@@ -234,7 +236,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, entries, onClose }) =
               ].map((format) => (
                 <button
                   key={format.value}
-                  onClick={() => setExportFormat(format.value as any)}
+                  onClick={() => setExportFormat(format.value as 'json' | 'txt' | 'csv')}
                   className={`p-4 rounded-lg border-2 transition-all duration-300 hover:scale-105 text-left ${
                     exportFormat === format.value
                       ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300'
@@ -265,7 +267,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, entries, onClose }) =
               ].map((range) => (
                 <button
                   key={range.value}
-                  onClick={() => setDateRange(range.value as any)}
+                  onClick={() => setDateRange(range.value as 'all' | 'month' | 'year' | 'custom')}
                   className={`p-3 rounded-lg border transition-all duration-300 hover:scale-105 ${
                     dateRange === range.value
                       ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300'

@@ -93,7 +93,7 @@ const Backup: React.FC<BackupProps> = ({ entries, user, onRestore }) => {
         }
 
         // Validate each entry
-        const validEntries = backupData.entries.filter((entry: any) => {
+        const validEntries = backupData.entries.filter((entry: Record<string, unknown>) => {
           return entry.id && entry.title && entry.content && entry.mood && 
                  typeof entry.isPrivate === 'boolean' && entry.createdAt;
         });
